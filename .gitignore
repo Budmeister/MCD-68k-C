@@ -1,0 +1,6 @@
+EASy68kELog.txt
+EASy68kOLog.txt
+*.o
+*.S
+!crt0.S
+bin/*
