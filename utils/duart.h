@@ -106,10 +106,10 @@ uint8_t selected_channel = CHANNEL_A;
 #define MODE_PARITY_ODD             0x04    /* MODE_PARITY_EVEN     if not specified */
 #define MODE_PARITY_EVEN            0x00
 
-#define MODE_CHAR_5_BITS            0x00    /* MODE_CHAR_5_BITS     if not specified */
-#define MODE_CHAR_6_BITS            0x01
-#define MODE_CHAR_7_BITS            0x02
-#define MODE_CHAR_8_BITS            0x03
+#define MODE_5_BIT_CHAR             0x00    /* MODE_CHAR_5_BITS     if not specified */
+#define MODE_6_BIT_CHAR             0x01
+#define MODE_7_BIT_CHAR             0x02
+#define MODE_8_BIT_CHAR             0x03
 
 /* Mode Register 2 */
 #define MODE_ECHO_NORMAL            0x00    /* MODE_ECHO_NORMAL     if not specified */

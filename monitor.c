@@ -21,7 +21,7 @@ int main() {
     usize_t num_words, i;
     /* Init Duart */
     select_channel(CHANNEL_A);
-    duart_init(MODE_RX_INT_RXRDY | MODE_ERR_MODE_CHAR | MODE_WITH_PARITY | MODE_PARITY_EVEN | MODE_CHAR_8_BITS);
+    duart_init(MODE_RX_INT_RXRDY | MODE_ERR_MODE_CHAR | MODE_WITH_PARITY | MODE_PARITY_EVEN | MODE_8_BIT_CHAR);
     duart_update_mode(MODE_ECHO_NORMAL | MODE_BIT_LENGTH_1);
     set_baud(BAUD_9600);
     command(ENABLE_TX | ENABLE_RX);
