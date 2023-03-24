@@ -1,16 +1,22 @@
 
 #include "io.h"
-#include "easy68k-utils.h"
 #include "68k.h"
 #include "string.h"
 #include "malloc.h"
 #include <stdarg.h>
+#ifdef SIM
+#include "easy68k-utils.h"
+#else
+#include "duart.h"
+#endif
 
 
 #ifdef CLRF
 #define isnewline(c1, c2) (c1 == '\n' && c2 == '\r')
+#define replacenl(str, i2, replace) str[i2-1] = replace
 #else
-#define isnewline(c1, c2) (c2 == '\n')
+#define isnewline(c1, c2) (c2 == '\r')
+#define replacenl(str, i2, replace) str[i2] = replace
 #endif
 
 void print_char(char c) {
@@ -112,29 +118,35 @@ void printf(const char* format, ...) {
     va_end(arguments);
 }
 
+void getl(unsigned char* buf, usize_t bufsize) {
+    usize_t i = 0;
+    buf[0] = getcb();
+    if(isnewline(0, buf[0])){
+        replacenl(buf, 0, '\0');
+        return;
+    }
+    if(buf[0] == '\0')
+        return;
+    for(i = 1; i < bufsize-1; i++) {
+        buf[i] = getcb();
+        if(isnewline(buf[i-1], buf[i])){
+            replacenl(buf, i, '\0');
+            break;
+        }
+        if(buf[i] == '\0')
+            break;
+    }
+    return;
+}
+
 /*
+ * Get Line Automatic
  * This uses malloc to allocate the buffer. Be sure to free
  * the returned pointer when finished with this string to 
  * avoid memory leaks.
  */
-unsigned char* getl(usize_t bufsize) {
-    unsigned char* l = malloc(bufsize);
-    usize_t i = 0;
-    l[0] = getcb();
-    if(isnewline(0, l[0])){
-        l[1] = '\0';
-        return l;
-    }
-    if(l[0] == '\0')
-        return l;
-    for(i = 1; i < bufsize-1; i++) {
-        l[i] = getcb();
-        if(isnewline(l[i-1], l[i])){
-            l[i+1] = '\0';
-            break;
-        }
-        if(l[i] == '\0')
-            break;
-    }
-    return l;
+unsigned char* getla(usize_t bufsize) {
+    unsigned char* buf = malloc(bufsize);
+    getl(buf, bufsize);
+    return buf;
 }

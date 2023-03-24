@@ -1,6 +1,15 @@
+
+
+# EASy68k log files
 EASy68kELog.txt
 EASy68kOLog.txt
+
+# C compilation files
+bin/*
 *.o
 *.S
+*.map
+*.srec
+
+# Include crt0.S
 !crt0.S
-bin/*

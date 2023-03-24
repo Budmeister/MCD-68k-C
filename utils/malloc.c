@@ -10,10 +10,33 @@ struct mptr_t{
 
 #define MALLOC_SIZE 8192
 #define MAX_MPTRS MALLOC_SIZE/sizeof(mptr_t)
+#define HEAP_SIZE 12288
+#define HEAP_BORDER_KEYWORD 0x00C0FFEE
 usize_t num_mptrs = 0;
 extern void heap_start;
 
+#define MERR_NONE 0
+#define MERR_HBORDER_BROKEN 1
+#define MERR_MPTR_TABLE_FULL 2
+uint32_t malloc_error = MERR_NONE;
+
 struct mptr_t mptrs[MAX_MPTRS];
+
+/* Called from crt0.S */
+void minit() {
+    *(uint32_t*) ((char*) &heap_start + (HEAP_SIZE - 4)) = HEAP_BORDER_KEYWORD;
+}
+
+void mcheck() {
+    if(*(uint32_t*) ((char*) &heap_start + (HEAP_SIZE - 4)) == HEAP_BORDER_KEYWORD) {
+        malloc_error = MERR_HBORDER_BROKEN;
+        return;
+    }else if(num_mptrs == MAX_MPTRS) {
+        malloc_error = MERR_MPTR_TABLE_FULL;
+        return;
+    }
+    malloc_error = MERR_NONE;
+}
 
 void* malloc(usize_t size) {
     usize_t gap, i, small = MAX_USIZE, small_i = num_mptrs;
@@ -28,6 +51,8 @@ void* malloc(usize_t size) {
     */
     if(num_mptrs == 0) {
         new.ptr = &heap_start;
+        if((usize_t) new.ptr + new.size >= (usize_t) &heap_start + HEAP_SIZE - 4)
+            return NULL;
         mptrs[num_mptrs++] = new;
         return new.ptr;
     }
@@ -35,7 +60,7 @@ void* malloc(usize_t size) {
         return NULL;
     /* Find the smallest gap greater than size */
     for(i = 1; i < num_mptrs; i++) {
-        gap = ((usize_t) mptrs[i].ptr) - (usize_t) mptrs[i-1].ptr - mptrs[i-1].size;
+        gap = (usize_t) mptrs[i].ptr - (usize_t) mptrs[i-1].ptr - mptrs[i-1].size;
         /* printf("Index: %d, gap: %d\r\n", i, gap); */
         if(gap >= size && gap < small) {
             small = gap;
@@ -44,6 +69,8 @@ void* malloc(usize_t size) {
     }
     /* printf("Smallest gap %d bytes at index %d\r\n", small, small_i); */
     new.ptr = (void*) ((usize_t) mptrs[small_i-1].ptr + mptrs[small_i-1].size);
+    if((usize_t) new.ptr + new.size >= (usize_t) &heap_start + HEAP_SIZE - 4)
+        return NULL;
     retval = new.ptr;
     /* Insert new at position small_i */
     while(small_i < num_mptrs) {
@@ -86,10 +113,9 @@ void print_malloc_status() {
 }
 
 void bcopy(const void *src, void *dest, size_t n) {
-    char *s = src;
+    const char *s = src;
     char *d = dest;
     while (n --> 0) {
         *d++ = *s++;
     }
 }
-

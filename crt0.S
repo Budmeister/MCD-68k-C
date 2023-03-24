@@ -223,6 +223,12 @@ SYM (start):
 	bge	1b
 
 /*
+ * Initialize malloc
+ */
+	.global minit
+	jsr minit
+
+/*
  * Call the main routine from the application to get it going.
  * main (argc, argv, environ)
  * We pass argv as a pointer to NULL.

@@ -28,11 +28,21 @@ int16_t hello() {
     return 0;
 }
 
+struct mystruct {
+    int a;
+    int b;
+};
+
+struct mystruct myfun() {
+    struct mystruct s;
+    return s;
+}
 
 
 int main() {
     char c;
     int *ptr1, *ptr2, *ptr3, *ptr4, *ptr5, *ptr6;
+    struct mystruct s;
     printf("\r\n\r\nTesting malloc\r\n");
     ptr1 = malloc(sizeof(int));
     printf("malloc(4) returned: %p\r\n", ptr1);
@@ -56,5 +66,6 @@ int main() {
             printf("%c", c);
         }
     }
+    s = myfun();
     return 0;
 }

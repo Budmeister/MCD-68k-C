@@ -64,6 +64,26 @@ PROVIDE(err_trap12  = __empty);
 PROVIDE(err_trap13  = __empty);
 PROVIDE(err_trap14  = __empty);
 PROVIDE(err_trap15  = __empty);
+
+
+PROVIDE(MRA         = 0x020000);
+PROVIDE(SRA_CSRA    = 0x020002);
+PROVIDE(MISR_CRA    = 0x020004);
+PROVIDE(RHRA_THRA   = 0x020006);
+PROVIDE(IPCR_ACR    = 0x020008);
+PROVIDE(ISR_IMR     = 0x02000a);
+PROVIDE(CTU         = 0x02000c);
+PROVIDE(CTL         = 0x02000e);
+PROVIDE(MRB         = 0x020010);
+PROVIDE(SRB_CSRB    = 0x020012);
+PROVIDE(_CRB        = 0x020014);
+PROVIDE(RHRB_THRB   = 0x020016);
+PROVIDE(IVR         = 0x020018);
+PROVIDE(IP_OPCR     = 0x02001a);
+PROVIDE(SCC_SOPBC   = 0x02001c);
+PROVIDE(STC_COPBC   = 0x02001e);
+
+
 /*
  * Initalize some symbols to be zero so we can reference them in the
  * crt0 without core dumping. These functions are all optional, but

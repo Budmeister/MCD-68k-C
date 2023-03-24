@@ -31,4 +31,28 @@
 
 #define NULL        0
 
+
+struct reg68k {
+    uint32_t d0;
+    uint32_t d1;
+    uint32_t d2;
+    uint32_t d3;
+    uint32_t d4;
+    uint32_t d5;
+    uint32_t d6;
+    uint32_t d7;
+    void* a0;
+    void* a1;
+    void* a2;
+    void* a3;
+    void* a4;
+    void* a5;
+    void* a6;
+    void* a7;
+    void* pc;
+} reg68k;
+
+struct reg68k getregs();
+
+
 #endif
