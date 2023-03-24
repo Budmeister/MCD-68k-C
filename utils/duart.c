@@ -7,24 +7,37 @@ void commandA(uint8_t com) {
 void commandB(uint8_t com) {
     _CRB = com;
 }
+void command(uint8_t com) {
+    if (select_channel == CHANNEL_A)
+        commandA(com);
+    else
+        commandB(com);
+}
 void standby() {
     commandA(SET_STANDBY);
 }
 void active() {
     commandA(SET_ACTIVE);
 }
-void set_baud(uint8_t baud, uint8_t channel) {
-    void (*command)(uint8_t);
+void duart_init(uint8_t mr1) {
+    if (selected_channel == CHANNEL_A)
+        MRA = mr1;
+    else
+        MRB = mr1;
+}
+void duart_update_mode(uint8_t mr2) {
+    if (selected_channel == CHANNEL_A)
+        MRA = mr2;
+    else
+        MRB = mr2;
+}
+void set_baud(uint8_t baud) {
     volatile uint8_t *CSR;
 
-    if (channel == CHANNEL_A) {
-        command = &commandA;
+    if (selected_channel == CHANNEL_A) {
         CSR = &SRA_CSRA;
-    } else if (channel == CHANNEL_B) {
-        command = &commandB;
-        CSR = &SRB_CSRB;
     } else {
-        return;
+        CSR = &SRB_CSRB;
     }
 
     /* SET X */
@@ -41,29 +54,14 @@ void set_baud(uint8_t baud, uint8_t channel) {
     *CSR = baud;
 }
 
-void echo(uint8_t mode, uint8_t channel) {
+void echo(uint8_t mode) {
     volatile uint8_t *MR;
-    if (channel == CHANNEL_A)
+    if (selected_channel == CHANNEL_A)
         MR = &MRA;
-    else if (channel == CHANNEL_B)
-        MR = &MRB;
     else
-        return;
+        MR = &MRB;
     mode = mode & 0xc0;
     *MR = (*MR & 0x3f) | mode;
-}
-
-bool availableA() {
-    return SRA_CSRA & STATUS_RXRDY;
-}
-
-char getcA() {
-    return RHRA_THRA;
-}
-
-char getcbA() {
-    while(!availableA());
-    return getcA();
 }
 
 void printA(const char* str) {
@@ -72,19 +70,6 @@ void printA(const char* str) {
         RHRA_THRA = *str;
         str++;
     }
-}
-
-bool availableB() {
-    return SRB_CSRB & STATUS_RXRDY;
-}
-
-char getcB() {
-    return RHRB_THRB;
-}
-
-char getcbB() {
-    while(!availableB());
-    return getcB();
 }
 
 void printB(const char* str) {
@@ -96,17 +81,36 @@ void printB(const char* str) {
 }
 
 bool available() {
-    return availableA();
+    if(selected_channel == CHANNEL_A)
+        return SRA_CSRA & STATUS_RXRDY;
+    else
+        return SRB_CSRB & STATUS_RXRDY;
 }
 
 char getc() {
-    return getcA();
+    if(selected_channel == CHANNEL_A)
+        return RHRA_THRA;
+    else
+        return RHRB_THRB;
 }
 
 char getcb() {
-    return getcbA();
+    while(!available());
+    return getc();
 }
 
 void print(const char* str) {
-    printA(str);
+    if(selected_channel == CHANNEL_A)
+        printA(str);
+    else
+        printB(str);
+}
+
+void select_channel(uint8_t channel) {
+    if(channel == CHANNEL_A || channel == CHANNEL_B)
+        selected_channel = channel;
+}
+
+uint8_t get_selected_channel() {
+    return selected_channel;
 }

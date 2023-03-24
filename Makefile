@@ -3,8 +3,8 @@ CC 		= m68k-coff-gcc
 LINKER_SCRIPT = linkerSupervisor.ld
 CFLAGS = -m68000 -O0 -fomit-frame-pointer --verbose -Wall -ansi
 LDFLAGS = -m68000 -Wl,-n -T$(LINKER_SCRIPT) -nostartfiles -Wl,-Map=$(basename $@).map
-# INCLUDES = bin/malloc.o bin/string.o bin/io.o bin/math.o bin/68k.o bin/duart.o
-INCLUDES = bin/malloc.o bin/string.o bin/io.o bin/math.o bin/68k.o bin/easy68k-utils.o
+INCLUDES = bin/malloc.o bin/string.o bin/io.o bin/math.o bin/68k.o bin/duart.o
+# INCLUDES = bin/malloc.o bin/string.o bin/io.o bin/math.o bin/68k.o bin/easy68k-utils.o
 
 test.o: test.c $(LINKER_SCRIPT)
 	$(CC) $(CFLAGS) test.c -c -o test.o

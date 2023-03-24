@@ -3,9 +3,10 @@
 #include "utils/68k.h"
 #include "utils/io.h"
 #include "utils/string.h"
+#include "utils/duart.h"
 
 #define COMMAND_BUFSIZE 20
-unsigned char command[COMMAND_BUFSIZE];
+unsigned char command_buf[COMMAND_BUFSIZE];
 
 void myfunc() {
 
@@ -18,12 +19,20 @@ void pause(char* msg);
 int main() {
     unsigned char** words;
     usize_t num_words, i;
+    /* Init Duart */
+    select_channel(CHANNEL_A);
+    duart_init(MODE_RX_INT_RXRDY | MODE_ERR_MODE_CHAR | MODE_WITH_PARITY | MODE_PARITY_EVEN | MODE_CHAR_8_BITS);
+    duart_update_mode(MODE_ECHO_NORMAL | MODE_BIT_LENGTH_1);
+    set_baud(BAUD_9600);
+    command(ENABLE_TX | ENABLE_RX);
+
+    /* Main Loop */
     while(1) {
         /* printf("Enter your command: "); */
-        getl(command, COMMAND_BUFSIZE);
-        printf("Command %s received\r\n", command);
+        getl(command_buf, COMMAND_BUFSIZE);
+        printf("Command %s received\r\n", command_buf);
         /* printf("%s\r", command); */
-        words = splitw(command, &num_words);
+        words = splitw(command_buf, &num_words);
         
         printf("Regs: \r\n");
         print_regs(getregs());
