@@ -22,6 +22,15 @@ char* strcpy(char* destination, const char* source) {
     return destination;
 }
 
+usize_t strlen(const char* str) {
+    usize_t len = 0;
+    while(*str != '\0') {
+        len++;
+        str++;
+    }
+    return len;
+}
+
 int32_t atoi(const unsigned char* str) {
     bool neg = false;
     usize_t i = 0;
@@ -34,6 +43,29 @@ int32_t atoi(const unsigned char* str) {
         if(str[i] < '0' || str[i] > '9')
             return 0;
         retval = retval * 10 + (str[i] - '0');
+    }
+    if(neg)
+        retval = -retval;
+    return retval;
+}
+
+int32_t stoi(const unsigned char* str) {
+    bool neg = false;
+    usize_t i = 0;
+    int32_t retval = 0;
+    if(str[i] == '-') {
+        neg = true;
+        i++;
+    }
+    for( ; str[i] != 0; i++) {
+        if(str[i] >= '0' && str[i] <= '9')
+            retval = retval * 16 + (str[i] - '0');
+        else if(str[i] >= 'a' && str[i] <= 'f')
+            retval = retval * 16 + (str[i] - 'a' + 10);
+        else if(str[i] >= 'A' && str[i] <= 'F')
+            retval = retval * 16 + (str[i] - 'A' + 10);
+        else
+            return 0;
     }
     if(neg)
         retval = -retval;
@@ -67,7 +99,6 @@ unsigned char* nextwhite(unsigned char* str) {
         str++;
     }
 }
-#include "io.h"
 /*
  * Returns NULL if there are no words (including the
  * case where there is only whitspace). Otherwise, 
@@ -86,6 +117,8 @@ unsigned char** splitw(unsigned char* str, usize_t* num_words) {
     {
         word = nextblack(word);
         if(word == NULL)
+            return NULL;
+        if(*word == '\0')
             return NULL;
         (*num_words)++;
         while(1) {

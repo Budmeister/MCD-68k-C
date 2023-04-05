@@ -8,11 +8,18 @@ struct mptr_t{
     usize_t size;
 } mptr_t; /* sizeof(struct mptr_t) == 8 bytes */
 
+/* USER_MODE macro will be defined in Makefile */
+#ifdef USER_MODE
 #define MALLOC_SIZE 8192
+#define HEAP_SIZE 24576
+#else
+#define MALLOC_SIZE 1024    /* Change to 8192 for user code */
+#define HEAP_SIZE 8192      /* Change to 24576 for user code */
+#endif
 #define MAX_MPTRS MALLOC_SIZE/sizeof(mptr_t)
-#define HEAP_SIZE 12288
+#define HEAP_BORDER ((uint32_t*) ((char*) &heap_start + (HEAP_SIZE - 4)))
 #define HEAP_BORDER_KEYWORD 0x00C0FFEE
-usize_t num_mptrs = 0;
+usize_t num_mptrs;
 extern void heap_start;
 
 #define MERR_NONE 0
@@ -24,14 +31,16 @@ struct mptr_t mptrs[MAX_MPTRS];
 
 /* Called from crt0.S */
 void minit() {
-    *(uint32_t*) ((char*) &heap_start + (HEAP_SIZE - 4)) = HEAP_BORDER_KEYWORD;
+    *HEAP_BORDER = HEAP_BORDER_KEYWORD;
+    num_mptrs = 0;
+    malloc_error = MERR_NONE;
 }
 
 void mcheck() {
-    if(*(uint32_t*) ((char*) &heap_start + (HEAP_SIZE - 4)) == HEAP_BORDER_KEYWORD) {
+    if(*HEAP_BORDER != HEAP_BORDER_KEYWORD) {
         malloc_error = MERR_HBORDER_BROKEN;
         return;
-    }else if(num_mptrs == MAX_MPTRS) {
+    }else if(num_mptrs >= MAX_MPTRS) {
         malloc_error = MERR_MPTR_TABLE_FULL;
         return;
     }
@@ -100,16 +109,25 @@ void print_malloc_status() {
     usize_t i;
     /* Put other local variables above stack */
     void* stack;
-    __asm__("
-        move.l %sp, 12(%sp)
-    ");
+    __asm__("move.l %sp, 12(%sp)");
     printf("Malloc status: \r\n");
-    printf("%d mptrs\r\n", num_mptrs);
+    printf("\t%d mptrs\r\n", num_mptrs);
     for(i = 0; i < num_mptrs; i++) {
-        printf("{%d, ptr: %p, size: %d}\r\n", i, mptrs[i].ptr, mptrs[i].size);
+        printf("\t\t{%d, ptr: %p, size: %d}\r\n", i, mptrs[i].ptr, mptrs[i].size);
     }
-    printf("Top of heap:     %p\r\n", num_mptrs == 0 ? &heap_start : (char*) mptrs[num_mptrs-1].ptr + mptrs[num_mptrs-1].size);
-    printf("Bottom of stack: %p\r\n", stack);
+    printf("\tTop of heap:      %p\r\n", num_mptrs == 0 ? &heap_start : (char*) mptrs[num_mptrs-1].ptr + mptrs[num_mptrs-1].size);
+    printf("\tHeap Border:      %p\r\n", HEAP_BORDER);
+    printf("\tBottom of stack:  %p\r\n", stack);
+    mcheck();
+    if(malloc_error == MERR_HBORDER_BROKEN) {
+        printf("\tMalloc Error:     Heap Border Broken\r\n");
+    } else if(malloc_error == MERR_MPTR_TABLE_FULL) {
+        printf("\tMalloc Error:     Mptr Table Full\r\n");
+    } else if(malloc_error == MERR_NONE) {
+        printf("\tMalloc Error:     None\r\n");
+    } else {
+        printf("\tMalloc Error:     Invalid Error: %d\r\n", malloc_error);
+    }
 }
 
 void bcopy(const void *src, void *dest, size_t n) {

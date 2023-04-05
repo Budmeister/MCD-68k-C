@@ -1,0 +1,37 @@
+00000100 Starting Address
+Assembler used: EASy68K Editor/Assembler v5.16.01
+Created On: 3/26/2023 3:48:53 PM
+
+00000000                             1  *-----------------------------------------------------------
+00000000                             2  * Program : Test Loop
+00000000                             3  * Written by : Instructor
+00000000                             4  * Date : 2010
+00000000                             5  * Description: Testing RAM with a subroutine jump. To jump
+00000000                             6  * to a subroutine, the PC and SR are pushed onto
+00000000                             7  * the stack which is a location in RAM. If the
+00000000                             8  * program continually loops, the RAM is working
+00000000                             9  *-----------------------------------------------------------
+00000000  =0001FFFC                 10  SUPER_STACK EQU $01FFFC ; MUST BE A VALID RAM LOCATION
+00000000                            11      ORG $000000
+00000000= 0001FFFC                  12      DC.L SUPER_STACK
+00000004= 00000100                  13      DC.L MAIN
+00000100                            14      ORG $000100
+00000100  4EB9 00010000             15  MAIN JSR RAM_TEST
+00000106  4EF8 0100                 16      JMP MAIN
+00010000                            17      ORG $010000
+00010000  4E71                      18  RAM_TEST NOP
+00010002  4E71                      19      NOP
+00010004  4E71                      20      NOP
+00010006  4E75                      21      RTS
+00010008                            22      END MAIN
+
+No errors detected
+No warnings generated
+
+
+SYMBOL TABLE INFORMATION
+Symbol-name         Value
+-------------------------
+MAIN                100
+RAM_TEST            10000
+SUPER_STACK         1FFFC

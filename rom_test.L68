@@ -1,0 +1,43 @@
+00000100 Starting Address
+Assembler used: EASy68K Editor/Assembler v5.16.01
+Created On: 3/24/2023 10:56:18 AM
+
+00000000                             1  *-----------------------------------------------------------
+00000000                             2  * Title      :
+00000000                             3  * Written by :
+00000000                             4  * Date       :
+00000000                             5  * Description:
+00000000                             6  *-----------------------------------------------------------
+00001000                             7      ORG    $1000
+00001000                             8  
+00001000                             9  *-----------------------------------------------------------
+00001000                            10  * Program : Test Loop
+00001000                            11  * Written by : Instructor
+00001000                            12  * Date : 2010
+00001000                            13  * Description: Testing ROM. NOP is "No operation" and will
+00001000                            14  * simply increase the PC
+00001000                            15  *-----------------------------------------------------------
+00001000                            16  
+00001000                            17  
+00001000  =00000FFE                 18  SUPER_STACK EQU $00FFE  ; note this stack pointer points to a location
+00001000                            19                          ; in ROM and therefore will not function as a
+00001000                            20                          ; stack, it is simply used as a place holder.
+00000000                            21      ORG $000000
+00000000= 00000FFE                  22      DC.L SUPER_STACK
+00000004= 00000100                  23      DC.L MAIN
+00000100                            24      ORG $000100
+00000100  4E71                      25  MAIN NOP
+00000102  4E71                      26      NOP
+00000104  4E71                      27      NOP
+00000106  4EF8 0100                 28      JMP MAIN
+0000010A                            29      END MAIN
+
+No errors detected
+No warnings generated
+
+
+SYMBOL TABLE INFORMATION
+Symbol-name         Value
+-------------------------
+MAIN                100
+SUPER_STACK         FFE

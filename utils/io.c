@@ -15,9 +15,14 @@
 #define isnewline(c1, c2) (c1 == '\n' && c2 == '\r')
 #define replacenl(str, i2, replace) str[i2-1] = replace
 #else
+#ifdef SIM
 #define isnewline(c1, c2) (c2 == '\r')
+#else
+#define isnewline(c1, c2) (c2 == 13)
+#endif
 #define replacenl(str, i2, replace) str[i2] = replace
 #endif
+#define NL '\r'
 
 void print_char(char c) {
     uint16_t str;

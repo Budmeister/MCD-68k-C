@@ -1,6 +1,7 @@
 
 /*
  * crt0.S -- startup file for m68k-coff
+ * This is the startup file for Supervisor Programs. For user programs, see user/crt0.S
  * 
  * From: file:///D:/GccAshWare/gcc-m68k-ashware/doc/porting_3.html
  * 
@@ -249,8 +250,9 @@ SYM (start):
  */
 	.even
 __main:
-__empty:
 	rts
+__empty:
+	rte
 /*
  * _exit -- Exit from the application. Normally we cause a user trap
  *          to return to the ROM monitor for another run.

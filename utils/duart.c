@@ -1,5 +1,6 @@
 #include "duart.h"
 
+uint8_t selected_channel = CHANNEL_A;
 
 void commandA(uint8_t com) {
     MISR_CRA = com;
@@ -8,7 +9,7 @@ void commandB(uint8_t com) {
     _CRB = com;
 }
 void command(uint8_t com) {
-    if (select_channel == CHANNEL_A)
+    if (selected_channel == CHANNEL_A)
         commandA(com);
     else
         commandB(com);
@@ -32,13 +33,6 @@ void duart_update_mode(uint8_t mr2) {
         MRB = mr2;
 }
 void set_baud(uint8_t baud) {
-    volatile uint8_t *CSR;
-
-    if (selected_channel == CHANNEL_A) {
-        CSR = &SRA_CSRA;
-    } else {
-        CSR = &SRB_CSRB;
-    }
 
     /* SET X */
     if(baud & BBM_X) {
@@ -51,17 +45,20 @@ void set_baud(uint8_t baud) {
     IPCR_ACR = baud & BBM_ACR7;    /* No other bits of ACR matter, only ACR[7] */
     baud &= BBM_SELECT;
     baud |= baud << 4;
-    *CSR = baud;
+
+    if (selected_channel == CHANNEL_A) {
+        SRA_CSRA = baud;
+    } else {
+        SRB_CSRB = baud;
+    }
 }
 
 void echo(uint8_t mode) {
-    volatile uint8_t *MR;
-    if (selected_channel == CHANNEL_A)
-        MR = &MRA;
-    else
-        MR = &MRB;
     mode = mode & 0xc0;
-    *MR = (*MR & 0x3f) | mode;
+    if (selected_channel == CHANNEL_A)
+        MRA = (MRA & 0x3f) | mode;
+    else
+        MRB = (MRB & 0x3f) | mode;
 }
 
 void printA(const char* str) {

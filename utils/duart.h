@@ -1,5 +1,5 @@
 #ifndef DUART_H
-
+#define DUART_H
 #include "68k.h"
 
                                         /* Read                                 Write                               */
@@ -24,7 +24,7 @@ extern volatile uint8_t STC_COPBC;      /* (Stop Counter/Timer Command)         
 #define CHANNEL_A                   0
 #define CHANNEL_B                   1
 
-uint8_t selected_channel = CHANNEL_A;
+extern uint8_t selected_channel;
 
 /* Command Register Commands */
 #define DISABLE_TX                  0x08    /* No change if unspecified */
@@ -141,5 +141,4 @@ void printB(const char* str);
 void select_channel(uint8_t channel);
 uint8_t get_selected_channel();
 
-#define DUART_H
 #endif

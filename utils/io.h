@@ -2,6 +2,11 @@
 #define IO_H
 
 #include "68k.h"
+#ifdef SIM
+#include "easy68k-utils.h"
+#else
+#include "duart.h"
+#endif
 
 void print_char(char c);
 void print_hex(uint32_t num);

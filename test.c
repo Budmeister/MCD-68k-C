@@ -1,71 +1,30 @@
-/*
-#include <math.h>
-#include <malloc.h>
-    float c = 3;
-    float d = c - 1.5;
-    return malloc(10);
-    free(ptr);
-*/
+
+
 #include "utils/malloc.h"
 #include "utils/68k.h"
-#include "utils/easy68k-utils.h"
 #include "utils/string.h"
 #include "utils/io.h"
+#include "utils/duart.h"
+#include "duart_test.h"
 
-void err_bus() {
-
-}
-
-void err_trap0() {
-    /* __asm__("reset"); */
-    while(1);
-}
-
-
-int16_t hello() {
-    int a = 2;
-    a = a + 3;
-    return 0;
-}
-
-struct mystruct {
-    int a;
-    int b;
-};
-
-struct mystruct myfun() {
-    struct mystruct s;
-    return s;
+void myerr() {
+    uint16_t sr;
+    uint32_t pc;
 }
 
 
 int main() {
-    char c;
-    int *ptr1, *ptr2, *ptr3, *ptr4, *ptr5, *ptr6;
-    struct mystruct s;
-    printf("\r\n\r\nTesting malloc\r\n");
-    ptr1 = malloc(sizeof(int));
-    printf("malloc(4) returned: %p\r\n", ptr1);
-    ptr2 = malloc(sizeof(int));
-    printf("malloc(4) returned: %p\r\n", ptr2);
-    ptr3 = malloc(sizeof(int));
-    printf("malloc(4) returned: %p\r\n", ptr3);
-    printf("Freeing %p\r\n", ptr3);
-    free(ptr3);
-    ptr4 = malloc(sizeof(int));
-    printf("malloc(4) returned: %p\r\n", ptr4);
-    printf("Freeing %p\r\n", ptr2);
-    free(ptr2);
-    ptr5 = malloc(6);
-    printf("malloc(6) returned: %p\r\n", ptr5);
-    ptr6 = malloc(4);
-    printf("malloc(4) returned: %p\r\n", ptr6);
+    select_channel(CHANNEL_A);
+    duart_init(MODE_RX_INT_RXRDY | MODE_ERR_MODE_CHAR | MODE_NO_PARITY | MODE_PARITY_EVEN | MODE_8_BIT_CHAR);
+    duart_update_mode(MODE_ECHO_NORMAL | MODE_BIT_LENGTH_1);
+    set_baud(BAUD_9600);    /* This writes the correct byte (0xBB), but for some reason it transmits and receives at 7200 */
+    command(ENABLE_TX | ENABLE_RX);
     while(1) {
-        c = getc();
-        if(c != -1) {
-            printf("%c", c);
-        }
+        printf("Baud byte: %x\r\n", BAUD_9600);
+        /* RHRA_THRA = 'j'; */
     }
-    s = myfun();
+   /*
+    INIT_DUART();
+    */
     return 0;
 }
