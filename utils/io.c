@@ -124,24 +124,27 @@ void printf(const char* format, ...) {
 }
 
 void getl(unsigned char* buf, usize_t bufsize) {
-    usize_t i = 0;
-    buf[0] = getcb();
-    if(isnewline(0, buf[0])){
-        replacenl(buf, 0, '\0');
-        return;
-    }
-    if(buf[0] == '\0')
-        return;
-    for(i = 1; i < bufsize-1; i++) {
+    usize_t i;
+    for(i = 0; i < bufsize-1; i++) {
         buf[i] = getcb();
-        if(isnewline(buf[i-1], buf[i])){
-            replacenl(buf, i, '\0');
+        if(buf[i] == NL) {
+            buf[i] = '\0';
             break;
         }
         if(buf[i] == '\0')
             break;
+        if(buf[i] == '\b') {
+            if(i > 0) {
+                print("\b \b");
+                i--;
+                i--;
+            } else
+                i--;
+            continue;
+        }
+        print_char(buf[i]);
     }
-    return;
+    print("\r\n");
 }
 
 /*

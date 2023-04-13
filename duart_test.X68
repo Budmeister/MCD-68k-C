@@ -9,10 +9,7 @@
 * data lines are usually run to the DUART data bus)
 ; *******************************************************************
 
-    ORG    $0000
-    DC.L    $00013FFC, $00001000
-
-    ORG    $1000
+    ORG    $14000
 
 ; Constants: (Note the (odd) offsets to account for no A0)
 DUART EQU $020000 loaded in A0 when needed, regs are offsets
@@ -26,9 +23,11 @@ RBA EQU 7 Receive Holding Register
 ACR EQU 9 Auxiliary control register
 RxRDY EQU 0 Recieve ready bit position
 TxRDY EQU 2 Transmit ready bit position
-BAUD EQU $CC baud rate value = 19,200 baud
+BAUD EQU $AA baud rate value = 7,200 baud
 ; *******************************************************************
-MAIN JSR EMPTY
+MAIN 
+    MOVE.L #$0001FFFC,A7
+    JSR EMPTY
     JSR EMPTY
     JSR INIT_DUART
 LOOP JSR LOOP
@@ -44,7 +43,7 @@ INIT_DUART LEA DUART,A0 A0 points to base DUART address
     MOVE.B #$20,CRA(A0) Reset RxA
     MOVE.B #$10,CRA(A0) Reset MRA pointer
     ; Initialization:
-    MOVE.B #$80,ACR(A0) selects baud rate set 2
+    MOVE.B #$00,ACR(A0) selects baud rate set 1
     MOVE.B #BAUD,CSRA(A0) set 19.2k baud Rx/Tx
     MOVE.B #$13,MR1A(A0) 8-bits, no parity, 1 stop bit
     ; This is the most important register to set in the 68681 DUART.
@@ -56,6 +55,7 @@ INIT_DUART LEA DUART,A0 A0 points to base DUART address
 
 SIMHALT
 END
+
 
 
 

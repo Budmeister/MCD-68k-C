@@ -1,6 +1,6 @@
 00000000 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.16.01
-Created On: 3/31/2023 10:50:04 AM
+Created On: 4/5/2023 11:33:09 AM
 
 00000000                             1  *-----------------------------------------------------------
 00000000                             2  * Subroutine : DUART enable
@@ -13,57 +13,56 @@ Created On: 3/31/2023 10:50:04 AM
 00000000                             9  * data lines are usually run to the DUART data bus)
 00000000                            10  ; *******************************************************************
 00000000                            11  
-00000000                            12      ORG    $0000
-00000000= 00013FFC 00001000         13      DC.L    $00013FFC, $00001000
-00000008                            14  
-00001000                            15      ORG    $1000
-00001000                            16  
-00001000                            17  ; Constants: (Note the (odd) offsets to account for no A0)
-00001000  =00020000                 18  DUART EQU $020000 loaded in A0 when needed, regs are offsets
-00001000  =00000001                 19  MR1A EQU 1 Mode Register1
-00001000  =00000001                 20  MR2A EQU 1 points here after MR1A is set
-00001000  =00000003                 21  SRA EQU 3 Status Register (read)
-00001000  =00000003                 22  CSRA EQU 3 Clock Select Register
-00001000  =00000005                 23  CRA EQU 5 Command Register
-00001000  =00000007                 24  TBA EQU 7 Transfer Holding Register
-00001000  =00000007                 25  RBA EQU 7 Receive Holding Register
-00001000  =00000009                 26  ACR EQU 9 Auxiliary control register
-00001000  =00000000                 27  RxRDY EQU 0 Recieve ready bit position
-00001000  =00000002                 28  TxRDY EQU 2 Transmit ready bit position
-00001000  =000000BB                 29  BAUD EQU $BB baud rate value = 19,200 baud
-00001000                            30  ; *******************************************************************
-00001000  4EB9 00001016             31  MAIN JSR EMPTY
-00001006  4EB9 00001016             32      JSR EMPTY
-0000100C  4EB9 00001020             33      JSR INIT_DUART
-00001012  4EB8 1012                 34  LOOP JSR LOOP
-00001016                            35  
-00001016  4EB9 0000101E             36  EMPTY JSR EMPTY2
-0000101C  4E75                      37      RTS
-0000101E                            38  
-0000101E  4E75                      39  EMPTY2 RTS
-00001020                            40  
-00001020  41F9 00020000             41  INIT_DUART LEA DUART,A0 A0 points to base DUART address
-00001026                            42      ; Software reset:
-00001026  117C 0030 0005            43      MOVE.B #$30,CRA(A0) Reset TxA
-0000102C  117C 0020 0005            44      MOVE.B #$20,CRA(A0) Reset RxA
-00001032  117C 0010 0005            45      MOVE.B #$10,CRA(A0) Reset MRA pointer
-00001038                            46      ; Initialization:
-00001038  117C 0080 0009            47      MOVE.B #$80,ACR(A0) selects baud rate set 2
-0000103E  117C 00BB 0003            48      MOVE.B #BAUD,CSRA(A0) set 19.2k baud Rx/Tx
-00001044  117C 0013 0001            49      MOVE.B #$13,MR1A(A0) 8-bits, no parity, 1 stop bit
-0000104A                            50      ; This is the most important register to set in the 68681 DUART.
-0000104A                            51      ; 07 sets: Normal mode, CTS and RTS disabled, stop bit length = 1
-0000104A                            52      ; For testing load $#47 to enable auto-echo
-0000104A  117C 0047 0001            53      MOVE.B #$47,MR2A(A0)
-00001050  117C 0005 0005            54      MOVE.B #$05,CRA(A0) enable Tx and Rx
-00001056  4E75                      55      RTS
-00001058                            56  
-00001058                            57  SIMHALT
-00001058                            58  END
-00001058                            59  
-00001058                            60  
-00001058                            61  
-Line 62 WARNING: END directive missing, starting address not set
+00014000                            12      ORG    $14000
+00014000                            13  
+00014000                            14  ; Constants: (Note the (odd) offsets to account for no A0)
+00014000  =00020000                 15  DUART EQU $020000 loaded in A0 when needed, regs are offsets
+00014000  =00000001                 16  MR1A EQU 1 Mode Register1
+00014000  =00000001                 17  MR2A EQU 1 points here after MR1A is set
+00014000  =00000003                 18  SRA EQU 3 Status Register (read)
+00014000  =00000003                 19  CSRA EQU 3 Clock Select Register
+00014000  =00000005                 20  CRA EQU 5 Command Register
+00014000  =00000007                 21  TBA EQU 7 Transfer Holding Register
+00014000  =00000007                 22  RBA EQU 7 Receive Holding Register
+00014000  =00000009                 23  ACR EQU 9 Auxiliary control register
+00014000  =00000000                 24  RxRDY EQU 0 Recieve ready bit position
+00014000  =00000002                 25  TxRDY EQU 2 Transmit ready bit position
+00014000  =000000AA                 26  BAUD EQU $AA baud rate value = 7,200 baud
+00014000                            27  ; *******************************************************************
+00014000                            28  MAIN 
+00014000  2E7C 0001FFFC             29      MOVE.L #$0001FFFC,A7
+00014006  4EB9 0001401E             30      JSR EMPTY
+0001400C  4EB9 0001401E             31      JSR EMPTY
+00014012  4EB9 00014028             32      JSR INIT_DUART
+00014018  4EB9 00014018             33  LOOP JSR LOOP
+0001401E                            34  
+0001401E  4EB9 00014026             35  EMPTY JSR EMPTY2
+00014024  4E75                      36      RTS
+00014026                            37  
+00014026  4E75                      38  EMPTY2 RTS
+00014028                            39  
+00014028  41F9 00020000             40  INIT_DUART LEA DUART,A0 A0 points to base DUART address
+0001402E                            41      ; Software reset:
+0001402E  117C 0030 0005            42      MOVE.B #$30,CRA(A0) Reset TxA
+00014034  117C 0020 0005            43      MOVE.B #$20,CRA(A0) Reset RxA
+0001403A  117C 0010 0005            44      MOVE.B #$10,CRA(A0) Reset MRA pointer
+00014040                            45      ; Initialization:
+00014040  117C 0000 0009            46      MOVE.B #$00,ACR(A0) selects baud rate set 1
+00014046  117C 00AA 0003            47      MOVE.B #BAUD,CSRA(A0) set 19.2k baud Rx/Tx
+0001404C  117C 0013 0001            48      MOVE.B #$13,MR1A(A0) 8-bits, no parity, 1 stop bit
+00014052                            49      ; This is the most important register to set in the 68681 DUART.
+00014052                            50      ; 07 sets: Normal mode, CTS and RTS disabled, stop bit length = 1
+00014052                            51      ; For testing load $#47 to enable auto-echo
+00014052  117C 0047 0001            52      MOVE.B #$47,MR2A(A0)
+00014058  117C 0005 0005            53      MOVE.B #$05,CRA(A0) enable Tx and Rx
+0001405E  4E75                      54      RTS
+00014060                            55  
+00014060                            56  SIMHALT
+00014060                            57  END
+00014060                            58  
+00014060                            59  
+00014060                            60  
+Line 61 WARNING: END directive missing, starting address not set
 
 No errors detected
 1 warning generated
@@ -73,21 +72,21 @@ SYMBOL TABLE INFORMATION
 Symbol-name         Value
 -------------------------
 ACR                 9
-BAUD                BB
+BAUD                AA
 CRA                 5
 CSRA                3
 DUART               20000
-EMPTY               1016
-EMPTY2              101E
-END                 1058
-INIT_DUART          1020
-LOOP                1012
-MAIN                1000
+EMPTY               1401E
+EMPTY2              14026
+END                 14060
+INIT_DUART          14028
+LOOP                14018
+MAIN                14000
 MR1A                1
 MR2A                1
 RBA                 7
 RXRDY               0
-SIMHALT             1058
+SIMHALT             14060
 SRA                 3
 TBA                 7
 TXRDY               2

@@ -105,10 +105,10 @@
 	.even
 	.global SYM (start)
 SYM (start):
-	link	a6, #-8
 /*
- * Do not load stack. The monitor program will load args onto stack before jumping into the program.
+ * Load stack
  */
+	move.l #__stack, sp
 
 /*
  * zerobss -- zero out the bss section

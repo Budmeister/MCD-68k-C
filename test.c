@@ -12,6 +12,10 @@ void myerr() {
     uint32_t pc;
 }
 
+static void my_static_fun() {
+    
+}
+
 
 int main() {
     select_channel(CHANNEL_A);

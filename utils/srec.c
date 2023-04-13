@@ -6,14 +6,14 @@
 
 /* Tests: s-record.s19 */
 
-usize_t (*loaded_program)(usize_t, char**);
+usize_t (*loaded_program)();
 
 
-usize_t run_program_as_user(usize_t argc, unsigned char** argv, void* start) {
+void run_program_as_user(void* start) {
     if(start != NULL)
         loaded_program = start;
-    __asm__("andi.w #0xdfff,%sr");     /* 57343 == 0b110111111111*/
-    loaded_program(argc, argv);
+    printf("Jumping to program at %p\r\n", loaded_program);
+    __asm__("trap #3");
     __asm__("trap #4");             /* Call trap after user program finishes*/
     __asm__("user_program_finished:");
 }
@@ -21,6 +21,12 @@ usize_t run_program_as_user(usize_t argc, unsigned char** argv, void* start) {
 void err_trap4() {
     __asm__("ori.w #0x2000,(%sp)");
     __asm__("move.l #user_program_finished,2(%sp)");
+    __asm__("rte");
+}
+
+void err_trap3() {
+    __asm__("andi.w #0xdfff,(%sp)");
+    __asm__("move.l loaded_program,2(%sp)");
     __asm__("rte");
 }
 

@@ -42,12 +42,12 @@ int main() {
     select_channel(CHANNEL_A);
     duart_init(MODE_RX_INT_RXRDY | MODE_ERR_MODE_CHAR | MODE_NO_PARITY | MODE_PARITY_EVEN | MODE_8_BIT_CHAR);
     duart_update_mode(MODE_ECHO_NORMAL | MODE_BIT_LENGTH_1);
-    set_baud(BAUD_9600);    /* This writes the correct byte (0xBB), but for some reason it transmits and receives at 7200 */
+    set_baud(BAUD_19200);    /* This writes the correct byte for 9600 (0xBB), but for some reason it transmits and receives at 7200 */
     command(ENABLE_TX | ENABLE_RX);
 
     /* echo(MODE_ECHO_AUTO); */
 #else
-    echo(true);
+    echo(false);
 #endif
 
     program_location = (void*) 0x0000c0;
@@ -55,10 +55,8 @@ int main() {
     while(1) {
         printf("turtle> ");
         current_regs = getregs();
-        /* printf("Enter your command: "); */
         getl(command_buf, COMMAND_BUFSIZE);
         printf("\r");
-        /* printf("%s\r", command); */
         argv = splitw(command_buf, &argc);
         if(argc != 0) {
             run_command(argc, argv);
@@ -236,27 +234,29 @@ void load_prog(usize_t argc, unsigned char** argv) {
     }
     /* Start load_program */
     printf("Loading program\r\n");
-    echo(false);
     load_srec();
-    echo(true);
     /* TODO */
 }
 
 void run_prog(usize_t argc, unsigned char** argv) {
-    usize_t result;
-    printf("Running program\r\n");
-    result = run_program_as_user(argc, argv, NULL);
-    printf("Program exited with exit code %d\r\n", result);
+    if(argc != 1) {
+        printf("Usage: %s\r\n", argv[0]);
+        return;
+    }
+    run_program_as_user(NULL);
 }
 
 void help(usize_t argc, unsigned char** argv) {
     printf(
         "\r\n"
+        "\trom                000000-010000\r\n"
+        "\tram                010000-020000\r\n"
+        "\r\n"
         "\tmd                 Memory Display\r\n"
         "\tmm                 Memory Modify\r\n"
         "\treg                Print Registers\r\n"
         "\treg D0 fedcba98    Write fedcba98 to D0\r\n"
-        "\tload 014000        Load program with launch location 014000\r\n"
+        "\tload               Load S-Record\r\n"
         "\trun                Run program\r\n"
         "\tmalloc             Print malloc status\r\n"
         "\thelp               Print this help message\r\n"
@@ -265,7 +265,46 @@ void help(usize_t argc, unsigned char** argv) {
 }
 
 void err_bus() {
+    register uint32_t num = 0;
     printf("Bus error\r\n");
+    /* print_regs(getregs()); */
+    __asm__("move.w 4(%sp), %d2");
+    printf("R/W(%d) I/N(%d) FC(%d%d%d)\r\n", !!(num&0x10), !!(num&0x8), !!(num&0x4), !!(num&0x2), !!(num&0x1));
+    __asm__("move.l 6(%sp), %d2");
+    printf("Access Address, %p\r\n", (void*) num);
+    __asm__("move.w 10(%sp), %d2");
+    printf("Instruction Register: %x\r\n", num);
+    __asm__("move.w 12(%sp), %d2");
+    printf("Status Register: %x\r\n", num);
+    __asm__("move.l 14(%sp), %d2");
+    printf("Program Counter: %x\r\n", num);
+    while(1);
+}
+
+void err_addr() {
+    register uint32_t num = 0;
+    printf("Address error\r\n");
+    /* print_regs(getregs()); */
+    __asm__("move.w 4(%sp), %d2");
+    printf("R/W(%d) I/N(%d) FC(%d%d%d)\r\n", !!(num&0x10), !!(num&0x8), !!(num&0x4), !!(num&0x2), !!(num&0x1));
+    __asm__("move.l 6(%sp), %d2");
+    printf("Access Address, %p\r\n", (void*) num);
+    __asm__("move.w 10(%sp), %d2");
+    printf("Instruction Register: %x\r\n", num);
+    __asm__("move.w 12(%sp), %d2");
+    printf("Status Register: %x\r\n", num);
+    __asm__("move.l 14(%sp), %d2");
+    printf("Program Counter: %x\r\n", num);
+    while(1);
+}
+
+void err_illegal() {
+    printf("Illegal operation error\r\n");
+    while(1);
+}
+
+void err_divzero() {
+    printf("Divide by zero error\r\n");
     while(1);
 }
 

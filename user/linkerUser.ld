@@ -31,7 +31,7 @@ SECTIONS
     } > ram
 }
 
-PROVIDE(__stack = 0x020000 + 0x10000 - 4);     /* ORIGIN(ram) + supervisor_size - 4 */
+PROVIDE(__stack = 0x020000 - 4);     /* ORIGIN(ram) + supervisor_size - 4 */
 
 
 PROVIDE(MRA         = 0x020001);

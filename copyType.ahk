@@ -1,3 +1,3 @@
-SetKeyDelay, 10
+SetKeyDelay, 1
 
 +^v::Send, % Clipboard
