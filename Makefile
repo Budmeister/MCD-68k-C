@@ -32,6 +32,9 @@ LDFLAGS = -m68000 -Wl,-n -T$(LINKER_SCRIPT) -nostartfiles -Wl,-Map=$(basename $@
 bin/%.o: utils/%.c
 	$(CC) $(CFLAGS) $< -c -o $@
 
+asm/%.S: %.c
+	$(CC) $(CFLAGS) $< -S -o $@
+
 supervisor/crt0.o: supervisor/crt0.S
 	$(CC) supervisor/crt0.S -c -o supervisor/crt0.o
 

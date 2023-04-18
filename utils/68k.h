@@ -53,6 +53,8 @@ struct reg68k {
 } reg68k;
 
 struct reg68k getregs();
+/* Defined in crt0.S */
+void exit();
 
 
 #endif
