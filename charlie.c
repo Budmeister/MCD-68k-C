@@ -142,7 +142,7 @@ int main()
     /* Diagonal Link Modifier */
     DLMod = 4;
     /* Link Exponential Modifier */
-    LEMod = 1.6;
+    LEMod = 2;
     /* Opponent Move Value Modifier */
     OppMod = 2;
     /* Opponent Advantage Value Modifier */
