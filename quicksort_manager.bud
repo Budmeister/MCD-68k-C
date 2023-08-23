@@ -1,0 +1,58 @@
+
+extern {
+    void printf(@(i8) str);
+    void getl(@(i8) buf, i32 bufsize);
+    i32 atoi(@(i8) str);
+
+    @(void) malloc(i32 size);
+    void free(@(void) ptr);
+
+    void bud_printArray(@(i32) arr, i32 size);
+    void bud_quicksort(@(i32) arr, i32 low, i32 high);
+    void c_quicksort(@(i32) arr, i32 low, i32 high);
+}
+
+void copy(@(i32) from, @(i32) to, i32 len) {
+    while len {
+        len = len - 1;
+        to[len] = from[len];
+    }
+}
+
+i32 main() {
+    i32 bufsize = 20;
+    i8[20] buf = empty;
+    getl(@buf, bufsize);
+    i32 n = atoi(@buf);
+    @(i32) real = malloc(n * 4);
+    @(i32) to_sort = malloc(n * 4);
+
+    i32 i = 0;
+    while i < n {
+        getl(@buf, bufsize);
+        i32 num = atoi(@buf);
+        real[i] = num;
+        i = i + 1;
+    }
+
+    copy(real, to_sort, n);
+    printf("s");
+
+    bud_quicksort(to_sort, 0, n - 1);
+    printf("e");
+
+    bud_printArray(to_sort, n);
+
+    copy(real, to_sort, n);
+    printf("s");
+
+    c_quicksort(to_sort, 0, n - 1);
+    printf("e");
+
+    bud_printArray(to_sort, n);
+
+    free(real);
+    free(to_sort);
+
+    return 0;
+}

@@ -1,0 +1,65 @@
+
+
+extern {
+    void printf(@(i8) str);
+
+    void c_swap(@(i32) a, @(i32) b);
+    void c_partition(@(i32) arr, i32 low, i32 high);
+    void c_quicksort(@(i32) arr, i32 low, i32 high);
+}
+
+void bud_swap(@(i32) a, @(i32) b) {
+    i32 temp = #a;
+    #a = #b;
+    #b = temp;
+}
+
+i32 bud_partition(@(i32) arr, i32 low, i32 high) {
+    i32 pivot = arr[high];
+    i32 i = (low - 1);
+    i32 j = low;
+
+    while j < high {
+        if arr[j] <= pivot {
+            i = i + 1;
+            bud_swap(@arr[i], @arr[j]);
+        }
+        j = j + 1;
+    }
+    bud_swap(@arr[i + 1], @arr[high]);
+    return (i + 1);
+}
+
+void bud_quicksort(@(i32) arr, i32 low, i32 high) {
+    i32 pivotIndex = empty;
+    if low < high {
+        pivotIndex = bud_partition(arr, low, high);
+
+        bud_quicksort(arr, low, pivotIndex - 1);
+        bud_quicksort(arr, pivotIndex + 1, high);
+    }
+}
+
+void bud_printArray(@(i32) arr, i32 size) {
+    i32 i = 0;
+    while i < size {
+        printf("%d ", arr[i]);
+        i = i + 1;
+    }
+    printf("\r\n");
+}
+
+i32 bud_main() {
+    i32[6] arr = [[10, 7, 8, 9, 1, 5]];
+    i32 n = 6;
+
+    printf("Original array: \r\n");
+    bud_printArray(@arr, n);
+
+    bud_quicksort(@arr, 0, n - 1);
+
+    printf("Sorted array: \r\n");
+    bud_printArray(@arr, n);
+
+    return 0;
+}

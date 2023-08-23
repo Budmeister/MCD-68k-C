@@ -1,8 +1,11 @@
 
 CC 		= m68k-coff-gcc
-LINKER_SCRIPT = supervisor/linkerSupervisor.ld
 CFLAGS = -m68000 -O0 -fomit-frame-pointer --verbose -Wall -ansi
 INCLUDES = bin/malloc.o bin/string.o bin/io.o bin/math.o bin/68k.o
+BUDC 	= .bud/budc.exe
+BUDFLAGS = -info
+BUDINCLUDES = quicksort_c.o quicksort_bud.o
+LINKER_SCRIPT = supervisor/linkerSupervisor.ld
 
 # When switching between SIM and not SIM or between IS_USER and not IS_USER,
 # do make clean because the libraries are dependent on those variables
@@ -23,11 +26,20 @@ else
 endif
 LDFLAGS = -m68000 -Wl,-n -T$(LINKER_SCRIPT) -nostartfiles -Wl,-Map=$(basename $@).map
 
+ifdef BUD
+	INCLUDES += $(BUDINCLUDES)
+endif
+
 %.srec: %.o $(CRT0) $(LINKER_SCRIPT) $(INCLUDES)
 	$(CC) $(LDFLAGS) $< $(INCLUDES) -o $@
 
 %.o: %.c
 	$(CC) $(CFLAGS) $< -c -o $@
+
+%.o: %.bud
+	$(BUDC) $< $(BUDFLAGS)
+	$(CC) $(CFLAGS) $*.S -c -o $@
+	rm $*.S
 
 bin/%.o: utils/%.c
 	$(CC) $(CFLAGS) $< -c -o $@
